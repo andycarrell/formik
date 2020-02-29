@@ -177,7 +177,7 @@ export function useFormik<Values extends FormikValues = FormikValues>({
     touched: props.initialTouched || emptyTouched,
     status: props.initialStatus,
     isSubmitting: false,
-    isValidating: false,
+    isValidating: validateOnMount,
     submitCount: 0,
   });
 

@@ -760,6 +760,68 @@ describe('<Formik>', () => {
     });
   });
 
+  describe('validateOnMount', () => {
+    it('should initialise with isValidating true when validateOnMount is true', () => {
+      const validate = () => Promise.resolve({ name: 'Error!' });
+      let initialFormikProps = null as FormikProps<Values> | null;
+
+      const InvalidOnMount = () => {
+        return (
+          <Formik
+            onSubmit={noop as any}
+            initialValues={InitialValues as any}
+            validate={validate}
+            validateOnMount={true}
+          >
+            {formikProps => {
+              if (!initialFormikProps) {
+                initialFormikProps = formikProps;
+              }
+              return null;
+            }}
+          </Formik>
+        );
+      };
+
+      render(<InvalidOnMount />);
+
+      const wasValidating = initialFormikProps?.isValidating;
+      expect(wasValidating).toBeTruthy();
+    });
+
+    it('runs validations if validateOnMount is true', async () => {
+      const validate = jest.fn(() => Promise.resolve({ name: 'Error!' }));
+      const { getByText } = renderFormik({
+        validate,
+        validateOnMount: true,
+        initialTouched: { name: true },
+      });
+
+      await wait(() => {
+        expect(validate).toHaveBeenCalledTimes(1);
+      });
+      await wait(() => {
+        expect(getByText('Error!')).toBeTruthy();
+      });
+    });
+
+    it('does NOT run validations if validateOnMount is false', async () => {
+      const validate = jest.fn(() => Promise.resolve({ name: 'Error!' }));
+      const { queryByText } = renderFormik({
+        validate,
+        validateOnMount: false,
+        initialTouched: { name: true },
+      });
+
+      await wait(() => {
+        expect(validate).not.toHaveBeenCalled();
+      });
+      await wait(() => {
+        expect(queryByText('Error!')).toBeNull();
+      });
+    });
+  });
+
   describe('FormikComputedProps', () => {
     it('should compute dirty as soon as any input is touched', () => {
       const { getProps } = renderFormik();
@@ -975,8 +1037,8 @@ describe('<Formik>', () => {
         content: [
           ['a1', 'a2'],
           ['b1', 'b2'],
-        ]
-      }
+        ],
+      };
 
       const dataForValidation = prepareDataForValidation(expected);
       expect(dataForValidation).toEqual(expected);
