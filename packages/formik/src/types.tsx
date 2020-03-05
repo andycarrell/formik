@@ -85,6 +85,8 @@ export interface FormikHelpers<Values> {
   setTouched(touched: FormikTouched<Values>, shouldValidate?: boolean): void;
   /** Manually set values object  */
   setValues(values: Values, shouldValidate?: boolean): void;
+  /** Merge new values into values object */
+  patchValues(values: Partial<Values>, shouldValidate?: boolean): void;
   /** Set value of form field directly */
   setFieldValue(field: string, value: any, shouldValidate?: boolean): void;
   /** Set error message of a form field directly */

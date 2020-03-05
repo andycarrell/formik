@@ -577,6 +577,11 @@ export function useFormik<Values extends FormikValues = FormikValues>({
     }
   );
 
+  const patchValues = useEventCallback(
+    (values: Partial<Values>, shouldValidate?: boolean) =>
+      setValues({ ...state.values, ...values }, shouldValidate)
+  );
+
   const setFieldError = React.useCallback(
     (field: string, value: string | undefined) => {
       dispatch({
@@ -850,6 +855,7 @@ export function useFormik<Values extends FormikValues = FormikValues>({
 
     validateForm: validateFormWithHighPriority,
     validateField,
+    patchValues,
     setErrors,
     setFieldError,
     setFieldTouched,
@@ -972,6 +978,7 @@ export function useFormik<Values extends FormikValues = FormikValues>({
     handleChange,
     handleReset,
     handleSubmit,
+    patchValues,
     resetForm,
     setErrors,
     setFormikState,

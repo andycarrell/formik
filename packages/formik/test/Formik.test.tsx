@@ -606,11 +606,71 @@ describe('<Formik>', () => {
     });
 
     describe('FormikHelpers', () => {
+      it('patchValues sets values', () => {
+        const { getProps } = renderFormik<Values>();
+
+        getProps().patchValues({ name: 'ian' });
+        expect(getProps().values.name).toEqual('ian');
+      });
+
+      it('patchValues sets values, preserving previous values where not specified', () => {
+        interface MoreValues {
+          name: string;
+          anotherName: string | undefined;
+        }
+        const { getProps } = renderFormik<Partial<MoreValues>>({
+          initialValues: { name: 'jared', anotherName: 'palmer' },
+        });
+
+        getProps().patchValues({ name: 'ian' });
+        expect(getProps().values.name).toEqual('ian');
+        expect(getProps().values.anotherName).toEqual('palmer');
+      });
+
+      it('patchValues should run validations when validateOnChange is true (default)', async () => {
+        const newValue: Values = { name: 'ian' };
+        const validate = jest.fn(_values => ({}));
+        const { getProps } = renderFormik({ validate });
+
+        getProps().patchValues(newValue);
+        await wait(() => {
+          expect(validate).toHaveBeenCalledWith(newValue, undefined);
+        });
+      });
+
+      it('patchValues should NOT run validations when validateOnChange is false', async () => {
+        const validate = jest.fn();
+        const { getProps, rerender } = renderFormik<Values>({
+          validate,
+          validateOnChange: false,
+        });
+
+        getProps().patchValues({ name: 'ian' });
+        rerender();
+        await wait(() => {
+          expect(validate).not.toHaveBeenCalled();
+        });
+      });
+
       it('setValues sets values', () => {
         const { getProps } = renderFormik<Values>();
 
         getProps().setValues({ name: 'ian' });
         expect(getProps().values.name).toEqual('ian');
+      });
+
+      it('setValues sets values, overwriting previous values', () => {
+        interface MoreValues {
+          name: string;
+          anotherName: string | undefined;
+        }
+        const { getProps } = renderFormik<Partial<MoreValues>>({
+          initialValues: { name: 'jared', anotherName: 'palmer' },
+        });
+
+        getProps().setValues({ name: 'ian' });
+        expect(getProps().values.name).toEqual('ian');
+        expect(getProps().values.anotherName).toEqual(undefined);
       });
 
       it('setValues should run validations when validateOnChange is true (default)', async () => {
@@ -975,8 +1035,8 @@ describe('<Formik>', () => {
         content: [
           ['a1', 'a2'],
           ['b1', 'b2'],
-        ]
-      }
+        ],
+      };
 
       const dataForValidation = prepareDataForValidation(expected);
       expect(dataForValidation).toEqual(expected);

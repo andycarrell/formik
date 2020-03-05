@@ -92,6 +92,7 @@ describe('withFormik()', () => {
       getFieldProps: expect.any(Function),
       getFieldMeta: expect.any(Function),
       getFieldHelpers: expect.any(Function),
+      patchValues: expect.any(Function),
       registerField: expect.any(Function),
       resetForm: expect.any(Function),
       setErrors: expect.any(Function),
@@ -172,6 +173,7 @@ describe('withFormik()', () => {
         { name: 'jared' },
         {
           props: myProps,
+          patchValues: expect.any(Function),
           resetForm: expect.any(Function),
           setErrors: expect.any(Function),
           setFieldError: expect.any(Function),
